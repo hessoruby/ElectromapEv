@@ -155,6 +155,9 @@ function Login() {
                     display: 'grid',
                     placeItems: 'center',
                     padding: 0,
+                    width: 32,
+                    height: 32,
+                    margin: -8,
                   }}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -296,6 +299,10 @@ function Login() {
               gap: 0.7rem;
               color: var(--text-muted);
               font-size: 0.84rem;
+            }
+
+            .auth-divider small {
+              font-size: inherit;
             }
 
             .auth-divider span {

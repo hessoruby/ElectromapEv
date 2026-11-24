@@ -947,7 +947,7 @@ function StationDrawer({ stationId, isOpen, onClose, socket, userLocation, onNav
                               dataKey="label"
                               type="category"
                               width={52}
-                              tick={{ fill: 'var(--text-secondary)', fontSize: 11 }}
+                              tick={{ fill: 'var(--text-secondary)', fontSize: 12 }}
                             />
                             <Tooltip
                               cursor={{ fill: 'rgba(255, 255, 255, 0.08)' }}
@@ -984,7 +984,7 @@ function StationDrawer({ stationId, isOpen, onClose, socket, userLocation, onNav
                           {review?.tags?.length ? (
                             <div style={{ marginTop: '0.45rem', display: 'flex', flexWrap: 'wrap', gap: '0.3rem' }}>
                               {review.tags.map((tag) => (
-                                <span key={`${review._id}-${tag}`} className="chip" style={{ fontSize: '0.74rem' }}>
+                                <span key={`${review._id}-${tag}`} className="chip" style={{ fontSize: 'var(--text-2xs)' }}>
                                   {tag}
                                 </span>
                               ))}

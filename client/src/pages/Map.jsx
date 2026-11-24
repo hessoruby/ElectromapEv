@@ -883,6 +883,7 @@ function MapPage() {
 	return (
 		<PageWrapper title="Map" className="hero-gradient">
 			<Navbar />
+			<h1 className="sr-only">Charging station map</h1>
 
 			<section
 				style={{
@@ -963,7 +964,7 @@ function MapPage() {
 									<MapPin size={14} />
 									{visibleMetrics.stationCount} stations in view
 								</span>
-								<span style={{ color: 'rgba(138, 138, 138, 0.72)' }}>|</span>
+								<span aria-hidden="true" style={{ color: 'var(--text-muted)' }}>|</span>
 								<span className="status-available" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem' }}>
 									<Zap size={14} />
 									{visibleMetrics.availableChargers} chargers available

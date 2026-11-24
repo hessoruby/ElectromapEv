@@ -138,7 +138,7 @@ function StationCard({
                 border: '1px solid rgba(232, 244, 248, 0.32)',
                 background: 'rgba(5, 10, 14, 0.66)',
                 color: station?.isOpen ? 'var(--green-glow)' : 'var(--red-alert)',
-                fontSize: '0.74rem',
+                fontSize: 'var(--text-2xs)',
                 fontWeight: 600,
               }}
             >

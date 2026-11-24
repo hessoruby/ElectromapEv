@@ -2,7 +2,7 @@ import { cn } from '../../utils/cn'
 
 const sizeMap = {
   sm: {
-    fontSize: '0.72rem',
+    fontSize: 'var(--text-2xs)',
     padding: '0.2rem 0.52rem',
   },
   md: {

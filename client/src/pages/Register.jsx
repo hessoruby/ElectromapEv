@@ -198,7 +198,7 @@ function Register() {
                   className="focus-ring"
                   onClick={() => setShowPassword((current) => !current)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  style={{ border: 'none', background: 'transparent', color: 'var(--text-secondary)', padding: 0 }}
+                  style={{ border: 'none', background: 'transparent', color: 'var(--text-secondary)', padding: 0, width: 32, height: 32, margin: -8, display: 'grid', placeItems: 'center' }}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -237,7 +237,7 @@ function Register() {
                   className="focus-ring"
                   onClick={() => setShowConfirmPassword((current) => !current)}
                   aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
-                  style={{ border: 'none', background: 'transparent', color: 'var(--text-secondary)', padding: 0 }}
+                  style={{ border: 'none', background: 'transparent', color: 'var(--text-secondary)', padding: 0, width: 32, height: 32, margin: -8, display: 'grid', placeItems: 'center' }}
                 >
                   {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -382,6 +382,10 @@ function Register() {
               gap: 0.7rem;
               color: var(--text-muted);
               font-size: 0.84rem;
+            }
+
+            .auth-divider small {
+              font-size: inherit;
             }
 
             .auth-divider span {

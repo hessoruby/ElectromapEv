@@ -450,7 +450,7 @@ function Home() {
           }
 
           .home-step-number {
-            color: var(--slate);
+            color: var(--text-muted);
             font-size: 0.82rem;
           }
 
@@ -550,7 +550,7 @@ function Home() {
           }
 
           .home-map-pin.offline {
-            background: var(--slate);
+            background: color-mix(in srgb, var(--slate) 70%, #000);
             color: var(--text-primary);
           }
 
@@ -589,7 +589,7 @@ function Home() {
             gap: 0.8rem;
           }
 
-          .home-pricing-panel span {
+          .home-pricing-panel > span {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;

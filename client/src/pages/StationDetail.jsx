@@ -256,6 +256,9 @@ function StationDetail() {
   const shouldUseMockData = isMockModeEnabled() || isMockStationId(stationId)
 
   const stationCoordinates = getStationCoordinates(station)
+  // Effects key on the numbers: getStationCoordinates returns a new array every render.
+  const stationLng = stationCoordinates?.[0]
+  const stationLat = stationCoordinates?.[1]
 
   const stationImages =
     Array.isArray(station?.images) && station.images.length ? station.images : []
@@ -551,7 +554,7 @@ function StationDetail() {
   }, [socket, station?._id])
 
   useEffect(() => {
-    if (!stationCoordinates || !station?._id) {
+    if (stationLng === undefined || stationLat === undefined || !station?._id) {
       return
     }
 
@@ -562,7 +565,8 @@ function StationDetail() {
       setNearbyError('')
 
       try {
-        const [lng, lat] = stationCoordinates
+        const lng = stationLng
+        const lat = stationLat
 
         if (shouldUseMockData) {
           const fallback = getMockNearbyStations({
@@ -603,7 +607,8 @@ function StationDetail() {
           return
         }
 
-        const [lng, lat] = stationCoordinates || []
+        const lng = stationLng
+        const lat = stationLat
         const fallback = getMockNearbyStations({
           lat,
           lng,
@@ -628,7 +633,7 @@ function StationDetail() {
     return () => {
       isActive = false
     }
-  }, [shouldUseMockData, station?._id, stationCoordinates])
+  }, [shouldUseMockData, station?._id, stationLat, stationLng])
 
   const handleAuthModalClose = () => {
     setPendingAuthAction(null)
@@ -1570,7 +1575,7 @@ function StationDetail() {
                       {review?.tags?.length ? (
                         <div style={{ display: 'flex', gap: '0.32rem', flexWrap: 'wrap' }}>
                           {review.tags.map((tag) => (
-                            <span key={`${review?._id}-${tag}`} className="chip" style={{ fontSize: '0.74rem' }}>
+                            <span key={`${review?._id}-${tag}`} className="chip" style={{ fontSize: 'var(--text-2xs)' }}>
                               {tag}
                             </span>
                           ))}
