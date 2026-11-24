@@ -1,8 +1,17 @@
+if (!process.argv.includes('--reset-demo-data')) {
+  console.error('Demo seeding deletes station, charger and review data. Use --reset-demo-data only with a disposable database.');
+  process.exit(1);
+}
+
 const path = require('path');
 const dotenv = require('dotenv');
 const mongoose = require('mongoose');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
+if (process.env.NODE_ENV === 'production') {
+  console.error('Demo seeding is disabled in production.');
+  process.exit(1);
+}
 
 const connectDB = require('../config/db');
 const User = require('../models/User');

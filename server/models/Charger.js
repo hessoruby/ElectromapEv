@@ -38,9 +38,8 @@ const chargerSchema = new mongoose.Schema(
   },
 );
 
-chargerSchema.pre('save', function stampLastUpdated(next) {
+chargerSchema.pre('save', function stampLastUpdated() {
   this.lastUpdated = new Date();
-  next();
 });
 
 const Charger = mongoose.model('Charger', chargerSchema);

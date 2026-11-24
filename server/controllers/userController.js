@@ -1,17 +1,7 @@
 const User = require('../models/User');
 const Review = require('../models/Review');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
-
-const parsePagination = (query) => {
-  const page = Math.max(1, Number.parseInt(query.page || '1', 10));
-  const limit = Math.min(100, Math.max(1, Number.parseInt(query.limit || '10', 10)));
-
-  return {
-    page,
-    limit,
-    skip: (page - 1) * limit,
-  };
-};
+const { parsePagination } = require('../utils/pagination');
 
 const getSavedStations = async (req, res, next) => {
   try {
@@ -59,7 +49,7 @@ const getUserProfile = async (req, res, next) => {
 
 const getMyReviews = async (req, res, next) => {
   try {
-    const { page, limit, skip } = parsePagination(req.query);
+    const { page, limit, skip } = parsePagination(req.query, { defaultLimit: 10 });
 
     const [total, reviews] = await Promise.all([
       Review.countDocuments({ userId: req.user._id }),

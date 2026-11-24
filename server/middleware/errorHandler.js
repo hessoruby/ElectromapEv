@@ -1,3 +1,5 @@
+const { ZodError } = require('zod');
+
 const { errorResponse } = require('../utils/apiResponse');
 
 const errorHandler = (err, req, res, next) => {
@@ -5,7 +7,14 @@ const errorHandler = (err, req, res, next) => {
   let message = err.message || 'Internal server error';
   let errors = null;
 
-  if (err.name === 'CastError') {
+  if (err instanceof ZodError) {
+    statusCode = 400;
+    message = 'Validation failed';
+    errors = err.issues.map((issue) => ({
+      path: issue.path.join('.'),
+      message: issue.message,
+    }));
+  } else if (err.name === 'CastError') {
     statusCode = 400;
     message = `Invalid ${err.path}: ${err.value}`;
   } else if (err.name === 'ValidationError') {

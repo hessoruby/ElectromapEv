@@ -3,3 +3,7 @@ reference.md
 node_modules/
 dist/
 build/
+# Local environment files (copy from .env.example)
+.env
+.env.*
+!.env.example

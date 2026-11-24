@@ -12,37 +12,12 @@ const adminRoutes = require('./routes/admin');
 const { protect, adminOnly } = require('./middleware/auth');
 const { generalLimiter } = require('./middleware/rateLimiter');
 const { errorHandler } = require('./middleware/errorHandler');
+const { corsOriginCallback } = require('./config/cors');
 
 const app = express();
 
-const configuredClientOrigins = String(process.env.CLIENT_URL || '')
-  .split(',')
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-
-const allowedOrigins = new Set([
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  ...configuredClientOrigins,
-]);
-
-const isLocalDevelopmentOrigin = (origin) =>
-  /^https?:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin);
-
 app.use(helmet());
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      if (!origin || allowedOrigins.has(origin) || isLocalDevelopmentOrigin(origin)) {
-        callback(null, true);
-        return;
-      }
-
-      callback(new Error('Origin not allowed by CORS'));
-    },
-    credentials: true,
-  })
-);
+app.use(cors({ origin: corsOriginCallback('CORS'), credentials: true }));
 app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

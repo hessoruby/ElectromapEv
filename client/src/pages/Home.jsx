@@ -20,12 +20,9 @@ import { BackgroundBeams } from '../components/ui/background-beams'
 import { getMockStations } from '../data/mockStations'
 import useGeolocation from '../hooks/useGeolocation'
 import api from '../services/api'
+import { isMockModeEnabled } from '../utils/mockMode'
 
-const heroStats = [
-  { value: '1,200+', label: 'Stations' },
-  { value: '48', label: 'Cities' },
-  { value: 'Live', label: 'Availability' },
-]
+const mockMode = isMockModeEnabled()
 
 const steps = [
   {
@@ -80,8 +77,10 @@ function MiniMapPreview() {
 }
 
 function Home() {
-  const [featuredStations, setFeaturedStations] = useState(() => getMockStations().slice(0, 6))
-  const [networkStats, setNetworkStats] = useState(heroStats)
+  const [featuredStations, setFeaturedStations] = useState(() =>
+    mockMode ? getMockStations().slice(0, 6) : [],
+  )
+  const [stationStatus, setStationStatus] = useState(mockMode ? '' : 'Loading stations…')
   const { location, requestLocation, isLoading: locating, error: locationError } = useGeolocation()
   const routeLocation = useLocation()
 
@@ -95,43 +94,30 @@ function Home() {
   }, [routeLocation.hash])
 
   useEffect(() => {
-    let mounted = true
+    if (mockMode) return
+    const controller = new AbortController()
 
     const loadStations = async () => {
       try {
         const { data } = await api.get('/stations', {
           params: { page: 1, limit: 8, sortBy: 'rating' },
+          signal: controller.signal,
         })
 
         const stations = data?.data?.stations || []
-        if (!mounted || !stations.length) {
-          return
-        }
-
-        const available = stations.reduce(
-          (total, station) => total + (Number(station?.availableChargers) || 0),
-          0,
-        )
-        const cities = new Set(stations.map((station) => station?.city).filter(Boolean))
-
+        if (controller.signal.aborted) return
         setFeaturedStations(stations.slice(0, 6))
-        setNetworkStats([
-          { value: `${Math.max(stations.length, 1200).toLocaleString('en-IN')}+`, label: 'Stations' },
-          { value: `${Math.max(cities.size, 48)}`, label: 'Cities' },
-          { value: available ? `${available}` : 'Live', label: 'Available now' },
-        ])
+        setStationStatus(stations.length ? '' : 'No stations are listed yet.')
       } catch {
-        if (mounted) {
-          setFeaturedStations(getMockStations().slice(0, 6))
+        if (!controller.signal.aborted) {
+          setStationStatus('Stations could not load. Try reloading the page.')
         }
       }
     }
 
     void loadStations()
 
-    return () => {
-      mounted = false
-    }
+    return () => controller.abort()
   }, [])
 
   const locationLabel = useMemo(() => {
@@ -199,17 +185,6 @@ function Home() {
         </div>
       </section>
 
-      <section className="home-stats-band">
-        <div className="container-shell home-stats-grid">
-          {networkStats.map((item) => (
-            <div key={item.label}>
-              <strong className="mono-data">{item.value}</strong>
-              <span>{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
       <section id="how-it-works" className="section-spacing home-section">
         <div className="container-shell">
           <div className="section-heading-row">
@@ -248,7 +223,7 @@ function Home() {
           <div className="section-heading-row">
             <div>
               <p className="home-kicker">Featured stations</p>
-              <h2 className="section-title">Reliable stops with live charger signals.</h2>
+              <h2 className="section-title">{mockMode ? 'Sample charging stations' : 'Explore charging stations'}</h2>
             </div>
             <Link to="/map" style={{ textDecoration: 'none' }}>
               <Button variant="ghost" rightIcon={<ArrowRight size={15} />}>
@@ -257,6 +232,7 @@ function Home() {
             </Link>
           </div>
 
+          {stationStatus && <p role="status">{stationStatus}</p>}
           <div className="home-station-strip">
             {featuredStations.map((station, index) => (
               <motion.div
@@ -425,39 +401,6 @@ function Home() {
             animation: float 4.5s ease-in-out infinite;
             animation-delay: var(--d);
             z-index: 2;
-          }
-
-          .home-stats-band {
-            border-top: 1px solid var(--border-subtle);
-            border-bottom: 1px solid var(--border-subtle);
-            box-shadow: var(--glow-cyan);
-            background: rgba(15, 30, 48, 0.72);
-          }
-
-          .home-stats-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-          }
-
-          .home-stats-grid div {
-            padding: 1.2rem;
-            display: grid;
-            justify-items: center;
-            gap: 0.18rem;
-            border-left: 1px solid var(--border-subtle);
-          }
-
-          .home-stats-grid div:last-child {
-            border-right: 1px solid var(--border-subtle);
-          }
-
-          .home-stats-grid strong {
-            font-size: clamp(1.35rem, 3vw, 2rem);
-            color: var(--text-primary);
-          }
-
-          .home-stats-grid span {
-            color: var(--text-muted);
           }
 
           .home-section {
@@ -662,7 +605,6 @@ function Home() {
               padding-bottom: 13rem;
             }
 
-            .home-stats-grid,
             .home-steps,
             .home-map-section,
             .home-final-cta {
@@ -700,10 +642,6 @@ function Home() {
               justify-content: flex-start;
             }
 
-            .home-stats-grid div {
-              border: none;
-              border-top: 1px solid var(--border-subtle);
-            }
           }
         `}
       </style>

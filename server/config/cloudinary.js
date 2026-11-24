@@ -1,17 +1,31 @@
 const cloudinary = require('cloudinary').v2;
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Configure at call time so credentials loaded by dotenv after this module is required are used.
+const getClient = () => {
+  const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+
+  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
+    const error = new Error('Image uploads are not configured on this server');
+    error.statusCode = 503;
+    throw error;
+  }
+
+  cloudinary.config({
+    cloud_name: CLOUDINARY_CLOUD_NAME,
+    api_key: CLOUDINARY_API_KEY,
+    api_secret: CLOUDINARY_API_SECRET,
+    secure: true,
+  });
+
+  return cloudinary;
+};
 
 const uploadImage = async (filePath, folder = 'electromap') => {
   if (!filePath) {
     return null;
   }
 
-  const result = await cloudinary.uploader.upload(filePath, {
+  const result = await getClient().uploader.upload(filePath, {
     folder,
     resource_type: 'image',
   });
@@ -25,7 +39,7 @@ const uploadBufferToCloudinary = (buffer, folder) => {
   }
 
   return new Promise((resolve, reject) => {
-    const stream = cloudinary.uploader.upload_stream(
+    const stream = getClient().uploader.upload_stream(
       {
         folder,
         resource_type: 'image',
@@ -49,7 +63,7 @@ const deleteImage = async (publicId) => {
     return null;
   }
 
-  return cloudinary.uploader.destroy(publicId, {
+  return getClient().uploader.destroy(publicId, {
     resource_type: 'image',
   });
 };

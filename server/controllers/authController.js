@@ -176,7 +176,7 @@ const updateProfile = async (req, res, next) => {
 
       const validCurrentPassword = await user.comparePassword(currentPassword);
       if (!validCurrentPassword) {
-        return errorResponse(res, 'Current password is incorrect', 401);
+        return errorResponse(res, 'Current password is incorrect', 400);
       }
 
       user.password = newPassword;

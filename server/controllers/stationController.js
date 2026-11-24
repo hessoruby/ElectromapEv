@@ -9,9 +9,9 @@ const { emitNewStation } = require('../services/socketService');
 const { successResponse, errorResponse } = require('../utils/apiResponse');
 const { haversineDistanceKm } = require('../utils/geoUtils');
 const { stationSchema } = require('../utils/validationSchemas');
+const { parsePagination } = require('../utils/pagination');
 
 const DEFAULT_RADIUS_METERS = 10000;
-const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 20;
 
 const parseBoolean = (value) => {
@@ -169,17 +169,6 @@ const isStationOpenNow = (operatingHours) => {
   return currentMinutes >= openMinutes || currentMinutes <= closeMinutes;
 };
 
-const parsePagination = (query) => {
-  const page = Math.max(DEFAULT_PAGE, Number.parseInt(query.page || DEFAULT_PAGE, 10));
-  const limit = Math.min(100, Math.max(1, Number.parseInt(query.limit || DEFAULT_LIMIT, 10)));
-
-  return {
-    page,
-    limit,
-    skip: (page - 1) * limit,
-  };
-};
-
 const buildChargerDocuments = (stationId, payload) => {
   if (Array.isArray(payload.chargers) && payload.chargers.length > 0) {
     return payload.chargers.map((charger) => ({
@@ -282,7 +271,7 @@ const getNearbyStations = async (req, res, next) => {
     const minRating = Number(req.query.minRating);
     const chargerTypes = normalizeArrayField(req.query.chargerType);
     const isOpenFilter = parseBoolean(req.query.isOpen);
-    const { page, limit, skip } = parsePagination(req.query);
+    const { page, limit, skip } = parsePagination(req.query, { defaultLimit: DEFAULT_LIMIT });
 
     const query = {
       location: {
@@ -337,7 +326,7 @@ const getNearbyStations = async (req, res, next) => {
 
 const getAllStations = async (req, res, next) => {
   try {
-    const { page, limit, skip } = parsePagination(req.query);
+    const { page, limit, skip } = parsePagination(req.query, { defaultLimit: DEFAULT_LIMIT });
     const sortBy = (req.query.sortBy || 'rating').trim().toLowerCase();
     const lat = Number(req.query.lat);
     const lng = Number(req.query.lng);

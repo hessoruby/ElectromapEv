@@ -120,9 +120,8 @@ stationSchema.index({ location: '2dsphere' });
 stationSchema.index({ city: 1, rating: -1 });
 stationSchema.index({ stationName: 'text', address: 'text', city: 'text' });
 
-stationSchema.pre('save', function stampUpdatedAt(next) {
+stationSchema.pre('save', function stampUpdatedAt() {
   this.updatedAt = new Date();
-  next();
 });
 
 const parseClock = (value) => {
